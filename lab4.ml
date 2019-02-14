@@ -51,11 +51,11 @@ Using your uncurry function, define uncurried versions of the plus and
 times functions.
 ......................................................................*)
 
-let plus =
-  fun _ -> failwith "plus not implemented"
+let plus (x : int * int) : int =
+  uncurry ( + ) x ;;
      
-let times =
-  fun _ -> failwith "times not implemented" ;;
+let times (x : int * int) : int =
+  uncurry ( * ) x ;;
   
 (*......................................................................
 Exercise 3: Recall the prods function from Lab 1:
@@ -69,8 +69,8 @@ Now reimplement prods using map and your uncurried times function. Why
 do you need the uncurried times function?
 ......................................................................*)
 
-let prods =
-  fun _ -> failwith "prods not implemented" ;; 
+let prods (x : (int * int) list) : int list =
+  List.map times x ;;
 
 (*======================================================================
 Part 2: Option types
@@ -105,7 +105,13 @@ be used when called on an empty list.
 ......................................................................*)
 
 let max_list_opt (lst : int list) : int option =
-  failwith "max_list_opt not implemented" ;;
+  let rec max_list_helper (sublst : int list) : int =
+    match sublst with
+    | [elt] -> elt
+    | head :: tail -> max head (max_list_helper tail) in
+  match lst with
+  | [] -> None
+  | l -> Some (max_list_helper l) ;;
 
 (*......................................................................
 Exercise 5: Alternatively, we could have max_list raise an exception
@@ -114,8 +120,11 @@ does so. What exception should it raise? (See Section 10.2 in the
 textbook for some advice.)
 ......................................................................*)
 
-let max_list (lst : int list) : int =
-  failwith "max_list not implemented" ;;
+let rec max_list (lst : int list) : int =
+  match lst with
+  | [] -> raise (Invalid_argument "max_list empty list")
+  | [elt] -> elt
+  | head :: tail -> max head (max_list tail) ;;
      
 (*......................................................................
 Exercise 6: Write a function min_option to return the smaller of two
